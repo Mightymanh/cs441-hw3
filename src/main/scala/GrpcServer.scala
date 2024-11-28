@@ -77,14 +77,12 @@ class GrpcServer(executionContext: ExecutionContext, port: Int) { self =>
         val response = client.execute(httpPost)
         val body = EntityUtils.toString(response.getEntity())
         GrpcServer.logger.info(s"Response from Aws Lambda: $body")
-        val data = (Json.parse(body) \ "response").get.toString()
-        println("hey")
-        println(data)
-        Future.successful(PromptResponse(response = data.substring(1, data.length() - 1)))
+        val data = (Json.parse(body) \ "response").as[String]
+        Future.successful(PromptResponse(response = data))
 //        Future.successful(PromptResponse(response = "\n* \"I Will Survive\" by Gloria Gaynor"))
       } catch {
         case x: Throwable =>
-          GrpcServer.logger.info(x.getMessage())
+          GrpcServer.logger.error(x.getMessage())
           Future.failed(new Error("Something wrong with the server"))
       } finally {
         client.close()

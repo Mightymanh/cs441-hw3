@@ -29,8 +29,8 @@ class BedrockLambda extends RequestHandler[APIGatewayProxyRequestEvent, APIGatew
 
   def processBedrockResponse(bedrockResponse: InvokeModelResponse): String = {
     val body = bedrockResponse.body().asUtf8String()
-    val response = (Json.parse(body) \ "completions" \ 0 \ "data" \ "text").as[String]
-    response
+    val response = (Json.parse(body) \ "completions" \ 0 \ "data" \ "text").get.toString()
+    response.substring(1,response.length() - 1)
   }
 
   def goodResponse(response: String): APIGatewayProxyResponseEvent = {
@@ -38,7 +38,6 @@ class BedrockLambda extends RequestHandler[APIGatewayProxyRequestEvent, APIGatew
     val responseEvent: APIGatewayProxyResponseEvent = new APIGatewayProxyResponseEvent()
     responseEvent.setStatusCode(200)
     responseEvent.withHeaders(Map(
-      "Access-Control-Allow-Origin" -> "*",
       "Content-Type" -> "application/json"
     ).asJava)
     responseEvent.setBody(responseBody)
@@ -50,7 +49,6 @@ class BedrockLambda extends RequestHandler[APIGatewayProxyRequestEvent, APIGatew
     val responseEvent: APIGatewayProxyResponseEvent = new APIGatewayProxyResponseEvent()
     responseEvent.setStatusCode(500)
     responseEvent.withHeaders(Map(
-      "Access-Control-Allow-Origin" -> "*",
       "Content-Type" -> "application/json"
     ).asJava)
     responseEvent.setBody(responseBody)
