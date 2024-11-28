@@ -1,0 +1,9 @@
+curl -X POST -H "Content-Type: application/json" -d '{"query":"Hi"}' localhost:8080/hello1
+
+curl localhost:8080/hello
+
+curl -v localhost:8080/hello   # get a more detail about request-response
+
+curl -X POST -H "Content-Type: application/json" -d '{"prompt":"Do you have any song recommendation for me today?"}' https://bwlaz3zizk.execute-api.us-east-2.amazonaws.com/bedrock-function
+
+curl -X POST -H "Content-Type: application/json" -d '{"prompt":"Do you have any song recommendation for me today?"}' localhost:8080/prompt
