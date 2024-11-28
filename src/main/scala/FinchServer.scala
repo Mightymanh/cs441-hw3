@@ -1,4 +1,4 @@
-import com.twitter.finagle.Http
+import com.twitter.finagle.{Http, ListeningServer}
 import com.twitter.util.Await
 import com.typesafe.config.{Config, ConfigFactory}
 import io.finch._
@@ -35,21 +35,9 @@ object FinchServer {
       // endpoint GET /hello
       val hello: Endpoint[String] = get("hello") {
         logger.info("get hello")
-        Ok("Hello, I am Finch Server!")
-      }
-
-      val prompt2: Endpoint[Response] = post("prompt2" :: jsonBody[Prompt]) { prompt: Prompt =>
-        logger.info("post prompt")
-        try {
-          val response = "\nDo you have any specific genres or artists in mind?" // in the form {"response":"<response>"}
-          logger.info(response)
-          Ok(Response(response = response))
-        } catch {
-          case x: Throwable => {
-            logger.error(x.getMessage())
-            InternalServerError(new Exception("Something wrong with server"))
-          }
-        }
+        Ok("Hello, I am Finch Server!").withHeaders(Map(
+          "Access-Control-Allow-Origin" -> "*"
+        ))
       }
 
       // endpoint POST /prompt
@@ -58,21 +46,25 @@ object FinchServer {
         try {
           val response = grpcClient.requestGrpc(prompt.prompt) // in the form {"response":"<response>"}
           logger.info(response.response)
-          Ok(response)
+          Ok(response).withHeaders(Map(
+            "Access-Control-Allow-Origin" -> "*"
+          ))
         } catch {
           case x: Throwable => {
-            logger.error(x.getMessage())
-            InternalServerError(new Exception("Something wrong with server"))
+            logger.error(x.getMessage)
+            InternalServerError(new Exception("Something wrong with server")).withHeaders(Map(
+              "Access-Control-Allow-Origin" -> "*"
+            ))
           }
         }
       }
 
       // server
-      val server = Http.server.serve(s":$finchPort", (hello :+: prompt :+: prompt2).toService)
+      val server = Http.server.serve(s":$finchPort", (hello :+: prompt).toService)
       logger.info(s"Finch Server is listening on port $finchPort. Grpc Server should be at $grpcHost on port $grpcPort")
       Await.ready(server)
     } catch {
-      case x: Throwable => logger.error(x.getMessage())
+      case x: Throwable => logger.error(x.getMessage)
     } finally {
       grpcClient.shutdown()
       logger.warn(s"Finch Server shuts down grpc communication with Grpc Server $grpcHost:$grpcPort")
