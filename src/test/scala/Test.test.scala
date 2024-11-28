@@ -81,5 +81,6 @@ class FinchThread extends Runnable {
   override def run(): Unit = {
     println("Finch thread runs")
     FinchServer.main(Array())
+    println("Thread finish running")
   }
 }
