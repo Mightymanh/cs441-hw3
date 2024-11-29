@@ -3,7 +3,7 @@ Author: Manh Phan
 
 Email: dphan8@uic.edu 
 
-Youtube demo Deploying app in AWS: []()
+Youtube demo Deploying app in AWS: [https://youtu.be/Ak6jiVi18Wk](https://youtu.be/Ak6jiVi18Wk)
 
 ## About
 This project is a more complicating version of an HTTP conversation where a user (or client) sends a prompt to server and server returns the response. 
